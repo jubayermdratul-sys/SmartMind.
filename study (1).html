@@ -1,0 +1,712 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>✨ Smart Ultimate App | Study, Routine, AI & PWA</title>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Manifest for PWA -->
+    <link rel="manifest" href="manifest.json">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #e0eafc 0%, #cfdef3 100%);
+            padding: 20px 12px;
+            min-height: 100vh;
+        }
+
+        .app {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            padding: 1.2rem 1.2rem 1.8rem;
+            transition: all 0.2s;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+
+        #datetime {
+            font-size: 0.85rem;
+            background: #f0f4fa;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 40px;
+            margin-left: 8px;
+            font-weight: 500;
+            color: #2c3e66;
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 20px 0 15px;
+            justify-content: center;
+        }
+
+        .tabs button {
+            background: #eef2f9;
+            color: #1f3a6b;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .tabs button:hover {
+            background: #d9e2f0;
+            transform: translateY(-1px);
+        }
+
+        .tab-content {
+            background: #ffffff;
+            border-radius: 1.5rem;
+            padding: 1rem 1rem 1.2rem;
+            margin: 12px 0;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #1f2f4e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #2b1055, #1b2a4e);
+            color: white;
+            padding: 15px;
+            border-radius: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 14px rgba(0,0,0,0.1);
+        }
+
+        .card input, .card select {
+            background: rgba(255,255,240,0.95);
+            border: none;
+            border-radius: 40px;
+            padding: 10px 14px;
+            margin: 6px 0;
+            width: 100%;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px 14px;
+            margin: 6px 0 8px;
+            border-radius: 28px;
+            border: 1.5px solid #e2e8f0;
+            background: #fefefe;
+        }
+
+        button {
+            background: linear-gradient(95deg, #2c3e66, #1f4e8c);
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .delete-btn {
+            background: linear-gradient(95deg, #c53030, #9b2c2c);
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            margin-left: 8px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 18px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 10px 6px;
+            text-align: left;
+            border-bottom: 1px solid #e2edf2;
+        }
+
+        th {
+            background: #eef2fa;
+            color: #1f3a6b;
+        }
+
+        tr.today {
+            background: #d4edda !important;
+            font-weight: 500;
+        }
+
+        .expense-total, .study-info {
+            background: #eef2ff;
+            border-radius: 32px;
+            padding: 8px 15px;
+            margin-top: 12px;
+            font-weight: bold;
+        }
+
+        #timer {
+            font-size: 2.6rem;
+            font-weight: 800;
+            font-family: monospace;
+            background: #eef2ff;
+            display: inline-block;
+            padding: 0.2rem 1.2rem;
+            border-radius: 80px;
+            margin: 8px 0;
+        }
+
+        .flex-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .ai-result ul {
+            list-style: none;
+            padding: 0;
+        }
+        .ai-result li {
+            background: #f3f4f6;
+            margin: 6px 0;
+            padding: 8px;
+            border-radius: 28px;
+            color: #1e293b;
+        }
+        canvas { max-height: 180px; margin-top: 12px; }
+        footer { font-size: 11px; text-align: center; margin-top: 16px; color: #4a627a; }
+    </style>
+</head>
+<body>
+<div class="app">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap;">
+        <h2>🚀 Smart Ultimate</h2>
+        <div id="datetime"></div>
+    </div>
+
+    <div class="tabs">
+        <button onclick="showTab('study')">📖 Study</button>
+        <button onclick="showTab('routine')">📅 Routine+AI</button>
+        <button onclick="showTab('expense')">💰 Expense</button>
+        <button onclick="showTab('notes')">📝 Notes</button>
+        <button onclick="showTab('tasks')">✅ Tasks</button>
+    </div>
+
+    <!-- ================= STUDY TAB ================= -->
+    <div id="studyTab" class="tab-content">
+        <h3>📚 Study Tracker</h3>
+        <div id="timer">00:00</div>
+        <div class="flex-row">
+            <button onclick="startTimer()">▶ Start</button>
+            <button onclick="stopTimer()">⏹️ Stop & Save</button>
+            <button onclick="resetStudyTotal()" style="background:#4a5568;">🔄 Reset Total</button>
+        </div>
+        <p id="studyInfo" class="study-info"></p>
+    </div>
+
+    <!-- ================= ROUTINE + AI + CHART + NOTIFICATIONS ================= -->
+    <div id="routineTab" class="tab-content" style="display:none;">
+        <h3>📢 Exam & Study Routine</h3>
+        <div class="card">
+            <input type="date" id="rDate" placeholder="Date (YYYY-MM-DD)">
+            <input type="text" id="rTime" placeholder="Time (e.g., 10:00 AM)">
+            <input type="text" id="rTopic" placeholder="Topic / Subject">
+            <input type="text" id="rTeacher" placeholder="Teacher">
+            <input type="text" id="rExam" placeholder="Exam Name">
+            <button onclick="addFullRoutine()">➕ Add to Routine</button>
+        </div>
+
+        <div class="table-container">
+            <table id="routineMasterTable">
+                <thead>
+                    <tr><th>Date</th><th>Day</th><th>Time</th><th>Topic</th><th>Teacher</th><th>Exam</th><th>Action</th></tr>
+                </thead>
+                <tbody id="routineTableBody"></tbody>
+            </table>
+        </div>
+
+        <!-- Chart.js -->
+        <canvas id="statsChart" width="400" height="180" style="max-width:100%; margin-top:16px;"></canvas>
+
+        <!-- AI Routine Generator -->
+        <h3 style="margin-top:20px;">🤖 AI Study Planner</h3>
+        <div class="card" style="background:#1e2a47;">
+            <input type="text" id="aiSubject" placeholder="Subject (e.g., Math)">
+            <input type="text" id="aiTopic" placeholder="Topic (e.g., Algebra)">
+            <input type="number" id="aiHours" placeholder="Daily study hours">
+            <button onclick="generateAIPlan()">✨ Generate Weekly Plan</button>
+        </div>
+        <div id="aiResultArea" class="ai-result"></div>
+        <p style="font-size:12px; margin-top:8px;">🔔 Notifications: you will be alerted 1 minute before routine time (if granted).</p>
+    </div>
+
+    <!-- ================= EXPENSE TAB ================= -->
+    <div id="expenseTab" class="tab-content" style="display:none;">
+        <h3>💰 Expense Logger</h3>
+        <input id="category" placeholder="Category (Food, Travel...)">
+        <input id="amount" type="number" placeholder="Amount">
+        <button onclick="addExpense()">+ Add Expense</button>
+        <div id="expenseTotalDisplay" class="expense-total">💰 Total: 0.00</div>
+        <ul id="expenseList"></ul>
+    </div>
+
+    <!-- ================= NOTES TAB (folders) ================= -->
+    <div id="notesTab" class="tab-content" style="display:none;">
+        <h3>📌 Notes with Folders</h3>
+        <input id="noteText" placeholder="Write your note...">
+        <input id="folderName" placeholder="Folder name (default: General)">
+        <button onclick="addNote()">➕ Add Note</button>
+        <select id="filter" style="margin-top: 8px;"></select>
+        <ul id="noteList"></ul>
+    </div>
+
+    <!-- ================= TASKS TAB (checkboxes) ================= -->
+    <div id="tasksTab" class="tab-content" style="display:none;">
+        <h3>✅ To-Do List</h3>
+        <input id="taskText" placeholder="New task ...">
+        <button onclick="addTask()">➕ Add Task</button>
+        <ul id="taskList"></ul>
+    </div>
+
+    <!-- ================= CALCULATOR ================= -->
+    <hr>
+    <h3>🧮 Quick Calc</h3>
+    <div class="flex-row">
+        <input id="num1" type="number" placeholder="Num 1" style="width:100px;">
+        <input id="num2" type="number" placeholder="Num 2" style="width:100px;">
+    </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+        <button onclick="calc('+')">➕ +</button><button onclick="calc('-')">➖ -</button>
+        <button onclick="calc('*')">✖️ *</button><button onclick="calc('/')">➗ /</button>
+    </div>
+    <p>Result: <span id="result">0</span></p>
+
+    <div style="display: flex; justify-content: center; gap: 12px; margin-top: 15px;">
+        <button onclick="downloadFullReport()" style="background:#2b6e3c;">📥 Download Report</button>
+    </div>
+    <footer>💾 All data saved locally | PWA ready | Smart notifications</footer>
+</div>
+
+<script>
+    // ----------------------------- TIME & TAB -----------------------------
+    function updateDateTime() {
+        document.getElementById("datetime").innerText = new Date().toLocaleString();
+    }
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+
+    function showTab(tab) {
+        const tabs = ["study", "routine", "expense", "notes", "tasks"];
+        tabs.forEach(t => document.getElementById(t + "Tab").style.display = "none");
+        document.getElementById(tab + "Tab").style.display = "block";
+        if (tab === 'routine') drawChart(); // refresh chart when visible
+    }
+
+    // ----------------------------- STUDY TIMER -----------------------------
+    let studySeconds = 0, timerInterval = null;
+    let totalStudyMins = parseInt(localStorage.getItem("studyTotalMins")) || 0;
+
+    function updateTimerDisplay() {
+        let mins = Math.floor(studySeconds / 60);
+        let secs = studySeconds % 60;
+        document.getElementById("timer").innerText = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+    }
+    function displayStudyInfo() {
+        let hrs = Math.floor(totalStudyMins / 60);
+        let mins = totalStudyMins % 60;
+        document.getElementById("studyInfo").innerHTML = `📊 Total studied: ${hrs}h ${mins}m (${totalStudyMins} minutes)`;
+    }
+    function startTimer() {
+        if (timerInterval) return;
+        timerInterval = setInterval(() => { studySeconds++; updateTimerDisplay(); }, 1000);
+    }
+    function stopTimer() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            let earnedMins = Math.floor(studySeconds / 60);
+            if (earnedMins > 0) {
+                totalStudyMins += earnedMins;
+                localStorage.setItem("studyTotalMins", totalStudyMins);
+            }
+            studySeconds = 0;
+            updateTimerDisplay();
+            displayStudyInfo();
+            drawChart();  // update chart after study change
+        } else if (studySeconds > 0) {
+            let earnedMins = Math.floor(studySeconds / 60);
+            if (earnedMins > 0) {
+                totalStudyMins += earnedMins;
+                localStorage.setItem("studyTotalMins", totalStudyMins);
+            }
+            studySeconds = 0;
+            updateTimerDisplay();
+            displayStudyInfo();
+            drawChart();
+        }
+    }
+    function resetStudyTotal() {
+        if (confirm("Reset total study minutes?")) {
+            totalStudyMins = 0;
+            localStorage.setItem("studyTotalMins", 0);
+            displayStudyInfo();
+            drawChart();
+        }
+    }
+    displayStudyInfo();
+
+    // ----------------------------- ROUTINE (full version + teacher/exam) -----------------------------
+    let examRoutines = JSON.parse(localStorage.getItem("examRoutineFull")) || [];
+
+    function addFullRoutine() {
+        let date = document.getElementById("rDate").value;
+        let time = document.getElementById("rTime").value.trim();
+        let topic = document.getElementById("rTopic").value.trim();
+        let teacher = document.getElementById("rTeacher").value.trim();
+        let exam = document.getElementById("rExam").value.trim();
+        if (!date) { alert("Please select date"); return; }
+        if (!topic) topic = "General";
+        examRoutines.push({ date, time: time || "-", topic, teacher: teacher || "-", exam: exam || "-" });
+        examRoutines.sort((a,b) => new Date(a.date) - new Date(b.date));
+        localStorage.setItem("examRoutineFull", JSON.stringify(examRoutines));
+        renderRoutineTable();
+        drawChart();
+        // Clear inputs except date (optional)
+        document.getElementById("rTime").value = "";
+        document.getElementById("rTopic").value = "";
+        document.getElementById("rTeacher").value = "";
+        document.getElementById("rExam").value = "";
+        document.getElementById("rDate").value = "";
+    }
+
+    function deleteRoutineEntry(index) {
+        examRoutines.splice(index, 1);
+        localStorage.setItem("examRoutineFull", JSON.stringify(examRoutines));
+        renderRoutineTable();
+        drawChart();
+    }
+
+    function renderRoutineTable() {
+        let tbody = document.getElementById("routineTableBody");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+        if (examRoutines.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">📭 No routines added. Add your schedule above!</td></tr>`;
+            return;
+        }
+        const todayStr = new Date().toISOString().split("T")[0];
+        examRoutines.forEach((item, idx) => {
+            let row = tbody.insertRow();
+            let dateObj = new Date(item.date);
+            let dayName = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+            if (item.date === todayStr) row.classList.add("today");
+            row.insertCell(0).innerText = item.date;
+            row.insertCell(1).innerText = dayName;
+            row.insertCell(2).innerText = item.time;
+            row.insertCell(3).innerText = item.topic;
+            row.insertCell(4).innerText = item.teacher;
+            row.insertCell(5).innerText = item.exam;
+            let actionCell = row.insertCell(6);
+            let delBtn = document.createElement("button");
+            delBtn.innerText = "🗑️";
+            delBtn.className = "delete-btn";
+            delBtn.onclick = () => deleteRoutineEntry(idx);
+            actionCell.appendChild(delBtn);
+        });
+    }
+    renderRoutineTable();
+
+    // ----------------------------- CHART.JS (study minutes vs routine count) -----------------------------
+    let chartInstance = null;
+    function drawChart() {
+        let ctx = document.getElementById("statsChart")?.getContext("2d");
+        if (!ctx) return;
+        if (chartInstance) chartInstance.destroy();
+        chartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['📚 Study (mins)', '📅 Routine entries'],
+                datasets: [{
+                    label: 'Stats',
+                    data: [totalStudyMins, examRoutines.length],
+                    backgroundColor: ['#3b82f6', '#10b981'],
+                    borderRadius: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { legend: { position: 'top' } }
+            }
+        });
+    }
+    drawChart();
+
+    // ----------------------------- NOTIFICATIONS (check routine times every minute) -----------------------------
+    if (Notification.permission !== "granted") Notification.requestPermission();
+
+    function checkAndNotify() {
+        let now = new Date();
+        let currentTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+        // also support 12hr format like "10:00 AM" -> convert to comparable
+        examRoutines.forEach(routine => {
+            let routineTime = routine.time.trim();
+            if (routineTime && routineTime !== "-") {
+                // compare ignoring case and spaces
+                let normalizedRoutine = routineTime.toLowerCase().replace(/\s/g, '');
+                let normalizedNow = currentTime.toLowerCase().replace(/\s/g, '');
+                if (normalizedRoutine === normalizedNow) {
+                    if (Notification.permission === "granted") {
+                        new Notification("📢 Study Reminder", { body: `Time for: ${routine.topic} | ${routine.exam ? "Exam: "+routine.exam : ""}` });
+                    }
+                }
+            }
+        });
+    }
+    setInterval(checkAndNotify, 60000);
+    checkAndNotify(); // immediate check
+
+    // ----------------------------- AI ROUTINE GENERATOR (weekly plan) -----------------------------
+    function generateAIPlan() {
+        let subject = document.getElementById("aiSubject").value.trim();
+        let topic = document.getElementById("aiTopic").value.trim();
+        let hours = parseFloat(document.getElementById("aiHours").value);
+        if (!subject) { alert("Enter subject"); return; }
+        if (isNaN(hours)) hours = 2;
+        let days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+        let container = document.getElementById("aiResultArea");
+        container.innerHTML = "<ul style='list-style:none; padding:0;'>";
+        days.forEach(day => {
+            let studyPlan = `${day}: Study ${subject} - ${topic || "core concepts"} for ${hours} hour(s)`;
+            let li = document.createElement("li");
+            li.textContent = studyPlan;
+            li.style.background = "#f1f5f9";
+            li.style.margin = "6px 0";
+            li.style.padding = "8px 12px";
+            li.style.borderRadius = "28px";
+            container.appendChild(li);
+        });
+        container.innerHTML += "</ul>";
+    }
+
+    // ----------------------------- EXPENSE -----------------------------
+    let expenses = JSON.parse(localStorage.getItem("expenseEntries")) || [];
+    function addExpense() {
+        let cat = document.getElementById("category").value.trim();
+        let amt = parseFloat(document.getElementById("amount").value);
+        if (!cat || isNaN(amt) || amt <= 0) { alert("Valid category & amount"); return; }
+        expenses.push({ category: cat, amount: amt });
+        localStorage.setItem("expenseEntries", JSON.stringify(expenses));
+        renderExpenses();
+        document.getElementById("category").value = "";
+        document.getElementById("amount").value = "";
+    }
+    function deleteExpense(idx) {
+        expenses.splice(idx, 1);
+        localStorage.setItem("expenseEntries", JSON.stringify(expenses));
+        renderExpenses();
+    }
+    function renderExpenses() {
+        let container = document.getElementById("expenseList");
+        let totalSpan = document.getElementById("expenseTotalDisplay");
+        if (!container) return;
+        container.innerHTML = "";
+        let total = 0;
+        expenses.forEach((exp, idx) => {
+            total += exp.amount;
+            let li = document.createElement("li");
+            li.innerHTML = `<span>${exp.category}: ৳${exp.amount.toFixed(2)}</span>`;
+            let delBtn = document.createElement("button");
+            delBtn.innerText = "❌";
+            delBtn.className = "delete-btn";
+            delBtn.onclick = () => deleteExpense(idx);
+            li.appendChild(delBtn);
+            container.appendChild(li);
+        });
+        totalSpan.innerText = `💰 Total Expense: ৳${total.toFixed(2)}`;
+    }
+    renderExpenses();
+
+    // ----------------------------- NOTES (folders & filter) -----------------------------
+    let notes = JSON.parse(localStorage.getItem("userNotes")) || [];
+    function rebuildFolderOptions() {
+        let filterSelect = document.getElementById("filter");
+        if (!filterSelect) return;
+        let folders = new Set(["all"]);
+        notes.forEach(n => folders.add(n.folder || "General"));
+        let current = filterSelect.value;
+        filterSelect.innerHTML = "";
+        Array.from(folders).forEach(f => {
+            let opt = document.createElement("option");
+            opt.value = f;
+            opt.innerText = f === "all" ? "📁 All folders" : `📂 ${f}`;
+            filterSelect.appendChild(opt);
+        });
+        if (current && folders.has(current)) filterSelect.value = current;
+        else filterSelect.value = "all";
+    }
+    function updateNotesDisplay() {
+        let container = document.getElementById("noteList");
+        if (!container) return;
+        let filterVal = document.getElementById("filter").value;
+        container.innerHTML = "";
+        notes.forEach((note, idx) => {
+            let folderName = note.folder || "General";
+            if (filterVal === "all" || folderName === filterVal) {
+                let li = document.createElement("li");
+                li.innerHTML = `<span>📌 ${escapeHtml(note.text)} <span style="font-size:11px; background:#e9ecef; padding:2px 8px; border-radius:20px;">${escapeHtml(folderName)}</span></span>`;
+                let delBtn = document.createElement("button");
+                delBtn.innerText = "🗑️";
+                delBtn.className = "delete-btn";
+                delBtn.onclick = () => deleteNote(idx);
+                li.appendChild(delBtn);
+                container.appendChild(li);
+            }
+        });
+    }
+    function deleteNote(index) {
+        notes.splice(index, 1);
+        localStorage.setItem("userNotes", JSON.stringify(notes));
+        rebuildFolderOptions();
+        updateNotesDisplay();
+    }
+    function addNote() {
+        let text = document.getElementById("noteText").value.trim();
+        let folder = document.getElementById("folderName").value.trim();
+        if (!text) { alert("Write note content"); return; }
+        notes.push({ text: text, folder: folder || "General" });
+        localStorage.setItem("userNotes", JSON.stringify(notes));
+        document.getElementById("noteText").value = "";
+        document.getElementById("folderName").value = "";
+        rebuildFolderOptions();
+        updateNotesDisplay();
+    }
+    function filterNotes() { updateNotesDisplay(); }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+    rebuildFolderOptions();
+    updateNotesDisplay();
+
+    // ----------------------------- TASKS (checkbox + delete) -----------------------------
+    let tasks = JSON.parse(localStorage.getItem("todoTasks")) || [];
+    function addTask() {
+        let text = document.getElementById("taskText").value.trim();
+        if (!text) { alert("Enter task"); return; }
+        tasks.push({ text: text, done: false });
+        localStorage.setItem("todoTasks", JSON.stringify(tasks));
+        renderTasks();
+        document.getElementById("taskText").value = "";
+    }
+    function toggleTask(idx) {
+        tasks[idx].done = !tasks[idx].done;
+        localStorage.setItem("todoTasks", JSON.stringify(tasks));
+        renderTasks();
+    }
+    function deleteTask(idx) {
+        tasks.splice(idx, 1);
+        localStorage.setItem("todoTasks", JSON.stringify(tasks));
+        renderTasks();
+    }
+    function renderTasks() {
+        let container = document.getElementById("taskList");
+        if (!container) return;
+        container.innerHTML = "";
+        tasks.forEach((t, idx) => {
+            let li = document.createElement("li");
+            let div = document.createElement("div");
+            div.style.display = "flex"; div.style.alignItems = "center"; div.style.gap = "10px"; div.style.flex = "1";
+            let cb = document.createElement("input");
+            cb.type = "checkbox";
+            cb.checked = t.done;
+            cb.onclick = () => toggleTask(idx);
+            let span = document.createElement("span");
+            span.innerText = t.text;
+            if (t.done) span.style.textDecoration = "line-through";
+            div.appendChild(cb); div.appendChild(span);
+            let delBtn = document.createElement("button");
+            delBtn.innerText = "🗑️";
+            delBtn.className = "delete-btn";
+            delBtn.onclick = () => deleteTask(idx);
+            li.appendChild(div); li.appendChild(delBtn);
+            container.appendChild(li);
+        });
+    }
+    renderTasks();
+
+    // ----------------------------- CALCULATOR -----------------------------
+    function calc(op) {
+        let a = parseFloat(document.getElementById("num1").value) || 0;
+        let b = parseFloat(document.getElementById("num2").value) || 0;
+        let res;
+        if (op === '+') res = a + b;
+        else if (op === '-') res = a - b;
+        else if (op === '*') res = a * b;
+        else if (op === '/') res = b !== 0 ? a / b : "Error (div zero)";
+        document.getElementById("result").innerText = res;
+    }
+
+    // ----------------------------- DOWNLOAD FULL REPORT -----------------------------
+    function downloadFullReport() {
+        let report = "📋 SMART ULTIMATE REPORT\n";
+        report += `📅 ${new Date().toLocaleString()}\n\n`;
+        report += `📖 STUDY: ${totalStudyMins} minutes (${Math.floor(totalStudyMins/60)}h ${totalStudyMins%60}m)\n`;
+        report += `📅 ROUTINE ENTRIES: ${examRoutines.length}\n`;
+        examRoutines.forEach(r => { report += `   • ${r.date} | ${r.time} | ${r.topic} | Teacher: ${r.teacher} | Exam: ${r.exam}\n`; });
+        let totalExp = expenses.reduce((s,e) => s + e.amount, 0);
+        report += `\n💰 EXPENSES TOTAL: ${totalExp.toFixed(2)}\n`;
+        expenses.forEach(e => { report += `   - ${e.category}: ${e.amount}\n`; });
+        report += `\n📝 NOTES: ${notes.length} notes\n`;
+        report += `✅ TASKS: ${tasks.filter(t=>t.done).length} completed / ${tasks.length} total\n`;
+        const blob = new Blob([report], {type: "text/plain"});
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `smart_report_${new Date().toISOString().slice(0,10)}.txt`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    // PWA Service Worker Registration (from snippet)
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(err => console.log("SW registration failed", err));
+    }
+
+    // initial chart drawing after loading expenses etc
+    window.addEventListener("load", () => { drawChart(); showTab('study'); });
+</script>
+</body>
+</html>
